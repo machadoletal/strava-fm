@@ -1,0 +1,6 @@
+.env
+dados.json
+relatorio.html
+setup_tokens.py
+__pycache__/
+*.pyc
