@@ -12,7 +12,8 @@ from strava import buscar_atividades
 
 load_dotenv()
 
-ARQUIVO_DADOS = "dados.json"
+PASTA = os.path.dirname(os.path.abspath(__file__))
+ARQUIVO_DADOS = os.path.join(PASTA, "dados.json")
 
 
 def carregar_dados_salvos():

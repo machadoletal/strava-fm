@@ -10,7 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 PASTA = os.path.dirname(os.path.abspath(__file__))
-ARQUIVO_RELATORIO = os.path.join(PASTA, "relatorio.html")
+ARQUIVO_RELATORIO = os.path.join(PASTA, "index.html")
 
 NOMES = {
     "Run": "Corrida",
@@ -88,7 +88,7 @@ def secao_tipo(df, tipo):
         return f"<p>Nenhum dado encontrado para {NOMES[tipo]}.</p>"
 
     total_musicas = len(df_tipo)
-    total_treinos = df_tipo["nome_treino"].count()
+    total_treinos = df_tipo["inicio_ts"].nunique()
     cor = CORES[tipo]
 
     top_artistas = df_tipo["artist"].value_counts().head(10)

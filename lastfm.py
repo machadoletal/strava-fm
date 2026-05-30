@@ -7,7 +7,7 @@ URL = "https://ws.audioscrobbler.com/2.0/"
 
 
 def buscar_pagina(api_key, username, pagina, from_ts=None):
-    """Busca uma página de scrobbles e retorna o JSON da resposta."""
+    """Busca uma página de scrobbles, tentando até 5 vezes em caso de erro 500."""
     parametros = {
         "method": "user.getRecentTracks",
         "api_key": api_key,
@@ -18,6 +18,17 @@ def buscar_pagina(api_key, username, pagina, from_ts=None):
     }
     if from_ts:
         parametros["from"] = from_ts
+
+    for tentativa in range(1, 6):
+        resposta = requests.get(URL, params=parametros, timeout=15)
+        if resposta.status_code == 500:
+            print(f"  Erro 500 na página {pagina}, tentativa {tentativa}/5. Aguardando...")
+            time.sleep(tentativa * 2)
+            continue
+        resposta.raise_for_status()
+        return resposta.json()
+
+    resposta.raise_for_status()
 
     resposta = requests.get(URL, params=parametros, timeout=15)
     resposta.raise_for_status()
