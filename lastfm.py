@@ -5,9 +5,14 @@ import time
 
 URL = "https://ws.audioscrobbler.com/2.0/"
 
+MAX_TENTATIVAS = 6
+# A API do Last.fm costuma responder 500/502/503/504 de forma intermitente,
+# e 429 quando o rate limit estoura. Todos valem uma nova tentativa.
+STATUS_TEMPORARIOS = {429, 500, 502, 503, 504}
+
 
 def buscar_pagina(api_key, username, pagina, from_ts=None):
-    """Busca uma página de scrobbles, tentando até 5 vezes em caso de erro 500."""
+    """Busca uma página de scrobbles, com retry e backoff em erros temporários."""
     parametros = {
         "method": "user.getRecentTracks",
         "api_key": api_key,
@@ -19,16 +24,28 @@ def buscar_pagina(api_key, username, pagina, from_ts=None):
     if from_ts:
         parametros["from"] = from_ts
 
-    for tentativa in range(1, 6):
-        resposta = requests.get(URL, params=parametros, timeout=15)
-        if resposta.status_code == 500:
-            print(f"  Erro 500 na página {pagina}, tentativa {tentativa}/5. Aguardando...")
-            time.sleep(tentativa * 2)
+    for tentativa in range(1, MAX_TENTATIVAS + 1):
+        try:
+            resposta = requests.get(URL, params=parametros, timeout=30)
+        except requests.exceptions.RequestException as erro:
+            if tentativa == MAX_TENTATIVAS:
+                raise
+            espera = 2 ** tentativa
+            print(f"  Falha de rede na página {pagina} ({erro.__class__.__name__}), "
+                  f"tentativa {tentativa}/{MAX_TENTATIVAS}. Aguardando {espera}s...")
+            time.sleep(espera)
             continue
+
+        if resposta.status_code in STATUS_TEMPORARIOS and tentativa < MAX_TENTATIVAS:
+            espera = 2 ** tentativa
+            print(f"  Erro {resposta.status_code} na página {pagina}, "
+                  f"tentativa {tentativa}/{MAX_TENTATIVAS}. Aguardando {espera}s...")
+            time.sleep(espera)
+            continue
+
         resposta.raise_for_status()
         return resposta.json()
 
-    # Esgotou as tentativas: propaga o último erro.
     resposta.raise_for_status()
     return resposta.json()
 
