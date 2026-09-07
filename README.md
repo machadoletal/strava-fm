@@ -1,38 +1,40 @@
 # StravaFM
 
-Análise das músicas que ouço durante meus treinos, cruzando os dados de
-**scrobbles do Last.fm** com as **atividades do Strava**.
+***English** · [Português](README.pt-BR.md)*
 
-O script busca as duas fontes, casa cada música com o treino que estava
-acontecendo naquele horário e gera um relatório HTML com rankings por tipo de
-atividade e os "setlists" dos meus melhores tempos.
+An analysis of the music I listen to during my workouts, cross-referencing
+**Last.fm scrobbles** with **Strava activities**.
 
-📊 **[Ver relatório de exemplo](https://machadoletal.github.io/strava-fm/)**
+The script pulls from both sources, matches each track to the workout that was
+happening at that moment, and generates an HTML report with rankings by
+activity type and the "setlists" of my personal records.
+
+📊 **[View sample report](https://machadoletal.github.io/strava-fm/)**
 (GitHub Pages · `docs/index.html`)
 
-## Como funciona
+## How it works
 
-1. **Strava** — baixa todas as atividades de corrida, musculação e bicicleta
-   (`strava.py`), renovando o access token a partir do refresh token.
-2. **Last.fm** — baixa todos os scrobbles a partir da data do treino mais
-   antigo (`lastfm.py`), com retry em caso de erro 500.
-3. **Cruzamento** — para cada atividade, seleciona os scrobbles cujo timestamp
-   cai dentro do intervalo `[início, fim]` do treino (`main.py`).
-4. **Relatório** — monta o HTML com gráficos (matplotlib) e tabelas
+1. **Strava** — downloads every running, weight-training and cycling activity
+   (`strava.py`), refreshing the access token from the refresh token.
+2. **Last.fm** — downloads every scrobble since the date of the oldest workout
+   (`lastfm.py`), retrying on HTTP 500.
+3. **Cross-referencing** — for each activity, selects the scrobbles whose
+   timestamp falls within the workout's `[start, end]` window (`main.py`).
+4. **Report** — builds the HTML with charts (matplotlib) and tables
    (`relatorio.py`).
 
-Os dados baixados são guardados em `dados.json` (ignorado pelo Git); nas
-próximas execuções o script reaproveita esse arquivo em vez de chamar as APIs.
+Downloaded data is cached in `dados.json` (Git-ignored); subsequent runs reuse
+that file instead of calling the APIs.
 
 ## Stack
 
 - Python 3.10+
-- [requests](https://pypi.org/project/requests/) — chamadas às APIs
-- [pandas](https://pandas.pydata.org/) — cruzamento e agregação
-- [matplotlib](https://matplotlib.org/) — gráficos
-- [python-dotenv](https://pypi.org/project/python-dotenv/) — carga do `.env`
+- [requests](https://pypi.org/project/requests/) — API calls
+- [pandas](https://pandas.pydata.org/) — cross-referencing and aggregation
+- [matplotlib](https://matplotlib.org/) — charts
+- [python-dotenv](https://pypi.org/project/python-dotenv/) — loads `.env`
 
-## Rodando localmente
+## Running locally
 
 ```bash
 git clone https://github.com/machadoletal/strava-fm.git
@@ -41,32 +43,33 @@ cd strava-fm
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-cp .env.example .env   # preencha com suas credenciais
+cp .env.example .env   # fill in your credentials
 python main.py
 ```
 
-O relatório é gerado em `docs/index.html`.
+The report is generated at `docs/index.html`. Delete `dados.json` first to
+force a fresh fetch from the APIs.
 
-### Credenciais
+### Credentials
 
-| Variável | Onde obter |
+| Variable | Where to get it |
 | --- | --- |
 | `LASTFM_API_KEY`, `LASTFM_USERNAME` | <https://www.last.fm/api/account/create> |
 | `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET` | <https://www.strava.com/settings/api> |
-| `STRAVA_REFRESH_TOKEN` | fluxo OAuth do Strava com escopo `activity:read_all` |
+| `STRAVA_REFRESH_TOKEN` | Strava OAuth flow with the `activity:read_all` scope |
 
-## Estrutura
+## Project layout
 
 ```
 strava-fm/
-├── main.py          # orquestração: busca, cruza e dispara o relatório
-├── strava.py        # cliente da API do Strava
-├── lastfm.py        # cliente da API do Last.fm
-├── relatorio.py     # geração do HTML (gráficos + tabelas)
+├── main.py          # orchestration: fetch, cross-reference, trigger the report
+├── strava.py        # Strava API client
+├── lastfm.py        # Last.fm API client
+├── relatorio.py     # HTML generation (charts + tables)
 └── docs/
-    └── index.html   # relatório gerado (servido pelo GitHub Pages)
+    └── index.html   # generated report (served by GitHub Pages)
 ```
 
-## Licença
+## License
 
 [MIT](LICENSE)
