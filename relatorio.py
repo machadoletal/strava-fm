@@ -10,7 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 PASTA = os.path.dirname(os.path.abspath(__file__))
-ARQUIVO_RELATORIO = os.path.join(PASTA, "index.html")
+ARQUIVO_RELATORIO = os.path.join(PASTA, "docs", "index.html")
 
 NOMES = {
     "Run": "Corrida",
@@ -176,7 +176,7 @@ def secao_prs(dados):
 
 
 def gerar_relatorio(dados):
-    """Gera o arquivo relatorio.html completo."""
+    """Gera o arquivo docs/index.html completo."""
     print("Gerando relatório...")
 
     df = achatar_dados(dados)
@@ -206,6 +206,7 @@ def gerar_relatorio(dados):
 
     html = f"<!DOCTYPE html><html><head><meta charset='utf-8'>{css}</head><body>{corpo}</body></html>"
 
+    os.makedirs(os.path.dirname(ARQUIVO_RELATORIO), exist_ok=True)
     with open(ARQUIVO_RELATORIO, "w", encoding="utf-8") as f:
         f.write(html)
 

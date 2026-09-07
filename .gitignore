@@ -1,5 +1,10 @@
+# Segredos e dados locais
 .env
 dados.json
 setup_tokens.py
+
+# Python
 __pycache__/
 *.pyc
+.venv/
+venv/

@@ -28,9 +28,7 @@ def buscar_pagina(api_key, username, pagina, from_ts=None):
         resposta.raise_for_status()
         return resposta.json()
 
-    resposta.raise_for_status()
-
-    resposta = requests.get(URL, params=parametros, timeout=15)
+    # Esgotou as tentativas: propaga o último erro.
     resposta.raise_for_status()
     return resposta.json()
 

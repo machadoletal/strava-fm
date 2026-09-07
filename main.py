@@ -4,10 +4,10 @@ import json
 import os
 from datetime import datetime, timezone
 
-import pandas as pd
 from dotenv import load_dotenv
 
 from lastfm import buscar_scrobbles
+from relatorio import gerar_relatorio
 from strava import buscar_atividades
 
 load_dotenv()
@@ -91,5 +91,4 @@ def main():
 
 if __name__ == "__main__":
     dados = main()
-    from relatorio import gerar_relatorio
     gerar_relatorio(dados)
